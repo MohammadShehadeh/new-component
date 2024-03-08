@@ -45,6 +45,12 @@ program
     'Path to the "components" directory (default: "src/components")',
     config.dir
   )
+  .option(
+    '-s, --scss-module <scssModuleEnabled>',
+    'Include SCSS module (default: "true")',
+    /^(true|false)$/i,
+    config.scssModule
+  )
   .parse(process.argv);
 
 const [componentName] = program.args;
@@ -53,6 +59,7 @@ const options = program.opts();
 
 const fileExtension = options.lang === 'js' ? 'js' : 'tsx';
 const indexExtension = options.lang === 'js' ? 'js' : 'ts';
+const scssModuleEnabled = options.scssModule === 'true' ? true : false;
 
 // Find the path to the selected template file.
 const templatePath = `./templates/${options.lang}.js`;
@@ -61,6 +68,7 @@ const templatePath = `./templates/${options.lang}.js`;
 const componentDir = `${options.dir}/${componentName}`;
 const filePath = `${componentDir}/${componentName}.${fileExtension}`;
 const indexPath = `${componentDir}/index.${indexExtension}`;
+const scssModulePath = `${componentDir}/${componentName}.module.scss`;
 
 // Our index template is super straightforward, so we'll just inline it for now.
 const indexTemplate = prettify(`\
@@ -72,6 +80,7 @@ logIntro({
   name: componentName,
   dir: componentDir,
   lang: options.lang,
+  scssModule: options.scssModule,
 });
 
 // Check if componentName is provided
@@ -102,27 +111,37 @@ mkDirPromise(componentDir)
     logItemCompletion('Directory created.');
     return template;
   })
-  .then((template) =>
-    // Replace our placeholders with real data (so far, just the component name)
-    template.replace(/COMPONENT_NAME/g, componentName)
-  )
-  .then((template) =>
-    // Format it using prettier, to ensure style consistency, and write to file.
-    writeFilePromise(filePath, prettify(template))
-  )
   .then((template) => {
-    logItemCompletion('Component built and saved to disk.');
+    // Replace our placeholders with real data (so far, just the component name)
+    template = template.replace(/COMPONENT_NAME/g, componentName);
+
+    if (!scssModuleEnabled) {
+      template = template.replace(`import styles from './${componentName}.module.scss';`, '');
+    }
+
     return template;
   })
-  .then((template) =>
+  .then((template) => {
+    // Format it using prettier, to ensure style consistency, and write to file.
+    writeFilePromise(filePath, prettify(template))
+    return template;
+  })
+  .then(() =>
+    logItemCompletion('Component built and saved to disk.')
+  ).then(() => {
+    if (scssModuleEnabled) writeFilePromise(scssModulePath)
+  })
+  .then(() => {
+    if (scssModuleEnabled) logItemCompletion("SCSS module file built and saved to disk.");
+  })
+  .then(() =>
     // We also need the `index.js` file, which allows easy importing.
     writeFilePromise(indexPath, prettify(indexTemplate))
   )
-  .then((template) => {
-    logItemCompletion('Index file built and saved to disk.');
-    return template;
-  })
-  .then((template) => {
+  .then(() =>
+    logItemCompletion("Index file built and saved to disk.")
+  )
+  .then(() => {
     logConclusion();
   })
   .catch((err) => {

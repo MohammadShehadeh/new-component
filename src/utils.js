@@ -43,7 +43,7 @@ module.exports.readFilePromise = (fileLocation) =>
 
 module.exports.writeFilePromise = (fileLocation, fileContent) =>
   new Promise((resolve, reject) => {
-    fs.writeFile(fileLocation, fileContent, 'utf-8', (err) => {
+    fs.writeFile(fileLocation, fileContent ?? '', 'utf-8', (err) => {
       err ? reject(err) : resolve();
     });
   });

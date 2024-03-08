@@ -33,6 +33,7 @@ module.exports.getConfig = () => {
   const defaults = {
     lang: 'js',
     dir: 'src/components',
+    scssModule: 'true',
   };
 
   const globalOverrides = requireOptional(
@@ -87,6 +88,11 @@ const langNames = {
   ts: 'TypeScript',
 };
 
+const scssModule = {
+  'true': 'Enabled',
+  'false': 'Disabled',
+};
+
 const logComponentLang = (selected) =>
   ['js', 'ts']
     .map((option) =>
@@ -96,7 +102,16 @@ const logComponentLang = (selected) =>
     )
     .join('  ');
 
-module.exports.logIntro = ({ name, dir, lang }) => {
+const logComponentSCSSModule = (selected) =>
+  ['true', 'false']
+    .map((option) =>
+      option === selected
+        ? `${chalk.bold.rgb(...colors.blue)(scssModule[option])}`
+        : `${chalk.rgb(...colors.darkGray)(scssModule[option])}`
+    )
+    .join('  ');
+
+module.exports.logIntro = ({ name, dir, lang, scssModule }) => {
   console.info('\n');
   console.info(
     `✨  Creating the ${chalk.bold.rgb(...colors.gold)(
@@ -106,10 +121,12 @@ module.exports.logIntro = ({ name, dir, lang }) => {
   console.info('\n');
 
   const pathString = chalk.bold.rgb(...colors.blue)(dir);
+  const scssModuleString = logComponentSCSSModule(scssModule);
   const langString = logComponentLang(lang);
 
   console.info(`Directory:  ${pathString}`);
   console.info(`Language:   ${langString}`);
+  console.info(`scssModule:   ${scssModuleString}`);
   console.info(
     chalk.rgb(...colors.darkGray)(
       '========================================='
