@@ -1,14 +1,17 @@
 {
-  "name": "new-component",
-  "version": "5.0.2",
+  "name": "@mohammadshehadeh/new-component",
+  "version": "5.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "CLI for creating new React components",
-  "homepage": "https://github.com/joshwcomeau/new-component",
+  "homepage": "https://github.com/MohammadShehadeh/new-component",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshwcomeau/new-component"
+    "url": "git+https://github.com/MohammadShehadeh/new-component.git"
   },
   "bugs": {
-    "url": "https://github.com/joshwcomeau/new-component/issues"
+    "url": "https://github.com/MohammadShehadeh/new-component/issues"
   },
   "main": "src/index.js",
   "scripts": {
@@ -24,7 +27,7 @@
   "author": "Joshua Comeau",
   "license": "MIT",
   "bin": {
-    "new-component": "./src/index.js"
+    "new-component": "src/index.js"
   },
   "dependencies": {
     "chalk": "4",
